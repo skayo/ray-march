@@ -5,6 +5,8 @@ Everything renders into a 120x120 pixel buffer; Raylib only opens the window and
 
 ## 1. Smiley (`main.odin`)
 
+![Smiley demo](media/smiley.gif)
+
 A yellow smiley face inside a box with six colored walls, drawn with signed distance functions.
 Drag with the left mouse button to orbit the camera around the face.
 
@@ -14,6 +16,8 @@ odin build . -o:speed
 ```
 
 ## 2. Parallax (`parallax/`)
+
+![Parallax demo](media/parallax.gif)
 
 The same kind of scene, but the screen is treated as a window into a shadow box.
 Moving your head (or the mouse) shifts the view through the window, so the box walls and a ball floating in front of the glass move with real parallax.
