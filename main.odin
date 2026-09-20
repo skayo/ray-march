@@ -271,10 +271,20 @@ calc_normal :: proc(p: Vec3) -> Vec3 {
 // Shading
 // ---------------------------------------------------------------------------
 
-// Single directional light, fixed in world space. Because it doesn't move with
-// the camera, orbiting around the face visibly changes which side is lit,
-// which is what makes the parallax effect read as a real object later.
-light_dir := linalg.normalize(Vec3{0.5, 0.8, 0.6})
+// Single directional light that rides with the camera, like a lamp mounted
+// above and to the right of the viewer. It is given in camera space (right,
+// up, toward the viewer) and rotated into world space once per frame, so the
+// face stays lit from the viewer's side however far the camera orbits. A
+// world-fixed light would leave the far side of the orbit nearly black; the
+// parallax experiment keeps a world-fixed light because there the scene, not
+// the camera, is what moves.
+LIGHT_CAM :: Vec3{0.5, 0.8, 0.6}
+
+light_direction :: proc(cam: Camera) -> Vec3 {
+	// forward points from the camera into the scene, so toward the viewer is
+	// -forward.
+	return linalg.normalize(cam.right * LIGHT_CAM.x + cam.up * LIGHT_CAM.y - cam.forward * LIGHT_CAM.z)
+}
 
 // Materials the light acts on. The walls are left out: they are a flat
 // backdrop whose job is to show the camera moving, and half of them face away
@@ -287,7 +297,7 @@ LIT :: bit_set[Material]{.Skin, .Feature}
 // vectors are unit length. A small ambient term keeps the dark side from going
 // fully black. An unlit material is just its albedo, and skipping the normal
 // for it spares six scene evaluations on every wall pixel.
-shade :: proc(p: Vec3, mat: Material) -> Vec3 {
+shade :: proc(p: Vec3, mat: Material, light_dir: Vec3) -> Vec3 {
 	if mat not_in LIT {
 		return albedo[mat]
 	}
@@ -369,6 +379,7 @@ render :: proc(buf: ^[RES * RES]Pixel, cam: Camera) {
 	// half-height is tan(fov/2); the image is square, so the half-width is
 	// the same. Every pixel maps to a point (u, v) on that plane.
 	half_extent := math.tan(FOV_DEG * 0.5 * math.PI / 180.0)
+	light_dir := light_direction(cam)
 
 	for y in 0 ..< RES {
 		// Row -> vertical plane coordinate: +half_extent on the top row,
@@ -387,7 +398,7 @@ render :: proc(buf: ^[RES * RES]Pixel, cam: Camera) {
 			h := march(cam.pos, rd)
 			if h.hit {
 				p := cam.pos + rd * h.t // reconstruct the hit point from t
-				color = shade(p, scene(p).mat) // one more query tells us what we hit
+				color = shade(p, scene(p).mat, light_dir) // one more query tells us what we hit
 			}
 			buf[y * RES + x] = to_pixel(color)
 		}
