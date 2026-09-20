@@ -1,0 +1,7 @@
+# Head tracker dependencies. Install into a venv from this directory:
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+#
+# mediapipe 1.0.x is pinned out: on macOS its CPU vision graphs abort at
+# graph open ("graph_service.h Check failed: service_ Service is unavailable",
+# google-ai-edge/mediapipe#6356). 0.10.35 works. Revisit when that is fixed.
+mediapipe>=0.10.35,<1

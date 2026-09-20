@@ -1,0 +1,11 @@
+# Odin build output
+/ray-march-test
+/parallax.bin
+/parallax/parallax
+
+# Python
+.venv/
+__pycache__/
+
+# Downloaded by tracker.py on first run
+/parallax/models/
