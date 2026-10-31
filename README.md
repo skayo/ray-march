@@ -1,4 +1,4 @@
-# ray-march-test
+# ray-march
 
 Two small CPU ray marching experiments written in [Odin](https://odin-lang.org/).
 Every pixel is computed on the CPU into a 120x120 buffer; [raylib](https://www.raylib.com/) only opens the window and shows it.
